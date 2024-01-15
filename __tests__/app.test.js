@@ -43,6 +43,31 @@ describe("/api", () => {
                 })
             })
         })
+        describe("/articles", () => {
+            test("returns array of articles with correct keys", () =>{
+                return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({body}) => {
+                    const { articles } = body
+                    expect(Object.keys(articles).length).toBeGreaterThan(0)
+                    articles.forEach((article) => {
+                        const ArtKeys = Object.keys(article)
+                        expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","comment_count","topic","created_at","votes","article_img_url"]))
+                        expect(ArtKeys).not.toContain("body")
+                    });
+                })
+            })
+            test("should be sorted by date descending", () =>{
+                return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({body}) => {
+                    const { articles } = body
+                    expect(articles).toBeSortedBy('created_at',{descending: true})
+                })
+            })
+        })
         describe("/articles/:id", () => {
             test("returns object with correct keys", () => {
                 return request(app)
@@ -52,15 +77,7 @@ describe("/api", () => {
                     const { article } = body
                     const ArtKeys = Object.keys(article[0])
                     expect(Object.keys(article).length).toBeGreaterThan(0)
-                    expect(ArtKeys).toContain("author")
-                    expect(ArtKeys).toContain("title")
-                    expect(ArtKeys).toContain("article_id")
-                    expect(ArtKeys).toContain("body")
-                    expect(ArtKeys).toContain("topic")
-                    expect(ArtKeys).toContain("created_at")
-                    expect(ArtKeys).toContain("votes")
-                    expect(ArtKeys).toContain("article_img_url")
-                    
+                    expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url"]))
                 })
             })
             test("Returns 404 with invalid ID", () => {
