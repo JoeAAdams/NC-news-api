@@ -14,10 +14,13 @@ app.get('/api/articles', getArticles)
 app.get('/api/articles/:article_id', getArticlesById)
 
 app.use((err,req,res,next)=>{
-    if (err.message && err.status){
-        res.status(err.status).send({msg: err.message})
+    if (err.msg && err.status){
+        res.status(err.status).send(err)
     }
     next(err)
 })
 
+app.use((err,req,res,next) => {
+    if(err.code === '22P02') res.status(400).send({status:400, msg: "Bad Request"})
+})
 module.exports = app;

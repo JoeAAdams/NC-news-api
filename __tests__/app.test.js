@@ -78,12 +78,24 @@ describe("/api", () => {
                     const ArtKeys = Object.keys(article[0])
                     expect(Object.keys(article).length).toBeGreaterThan(0)
                     expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url"]))
+                    expect(article[0].article_id).toBe(1)
                 })
             })
-            test("Returns 404 with invalid ID", () => {
+            test("Returns 404 \"Not Found\" with invalid ID", () => {
                 return request(app)
                 .get("/api/articles/20000")
                 .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Not Found")
+                })
+            })
+            test("Returns 400 \"Bad Request\" with invalid ID", () => {
+                return request(app)
+                .get("/api/articles/notanumber")
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Bad Request")
+                })
             })
         })
     })
