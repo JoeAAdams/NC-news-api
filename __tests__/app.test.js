@@ -89,9 +89,41 @@ describe("/api", () => {
                     expect(body.msg).toBe("Not Found")
                 })
             })
-            test("Returns 400 \"Bad Request\" with invalid ID", () => {
+            test("Returns 400 \"Bad Request\" with non-existant ID", () => {
                 return request(app)
                 .get("/api/articles/notanumber")
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Bad Request")
+                })
+            })
+        })
+        describe("articles/:article_id/comments", () => {
+            test("returns object with correct keys", () => {
+                return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(({body}) => {
+                    const { comments } = body
+                    expect(comments.length).toBeGreaterThan(0)
+                    comments.forEach(comment => {
+                    const commentKeys = Object.keys(comment)
+                    expect(commentKeys).toEqual(expect.arrayContaining(["comment_id","votes","created_at","author","body","article_id"]))
+                    expect(comment.article_id).toBe(1)
+                   });
+                })
+            })
+            test("Returns 404 \"Not Found\" with non-existant ID", () => {
+                return request(app)
+                .get("/api/articles/20000/comments")
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Not Found")
+                })
+            })
+            test("Returns 400 \"Bad Request\" with invalid ID", () => {
+                return request(app)
+                .get("/api/articles/notanumber/comments")
                 .expect(400)
                 .then(({body}) => {
                     expect(body.msg).toBe("Bad Request")
