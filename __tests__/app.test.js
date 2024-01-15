@@ -27,7 +27,6 @@ describe("/api", () => {
                     expect(Object.keys(endpoints[key])).toContain("exampleResponse")
                     expect(Object.keys(endpoints[key])).toContain("exampleRequest")
                 }
-
             })
         })
         describe("/topics", () => {
@@ -42,6 +41,32 @@ describe("/api", () => {
                         expect(Object.keys(topic)).toMatchObject(["slug","description"])
                     });
                 })
+            })
+        })
+        describe("/articles/:id", () => {
+            test("returns object with correct keys", () => {
+                return request(app)
+                .get("/api/articles/1")
+                .expect(200)
+                .then(({body}) => {
+                    const { article } = body
+                    const ArtKeys = Object.keys(article[0])
+                    expect(Object.keys(article).length).toBeGreaterThan(0)
+                    expect(ArtKeys).toContain("author")
+                    expect(ArtKeys).toContain("title")
+                    expect(ArtKeys).toContain("article_id")
+                    expect(ArtKeys).toContain("body")
+                    expect(ArtKeys).toContain("topic")
+                    expect(ArtKeys).toContain("created_at")
+                    expect(ArtKeys).toContain("votes")
+                    expect(ArtKeys).toContain("article_img_url")
+                    
+                })
+            })
+            test("Returns 404 with invalid ID", () => {
+                return request(app)
+                .get("/api/articles/20000")
+                .expect(404)
             })
         })
     })
