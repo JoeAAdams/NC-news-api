@@ -20,7 +20,6 @@ describe("/api", () => {
             .expect(200)
             .then(({body}) => {
                 const { endpoints } = body
-                console.log(endpoints)
                 expect(Object.keys(endpoints).length).toBeGreaterThan(0)
                 for (const key in endpoints) {
                     expect(Object.keys(endpoints[key])).toContain("description")
