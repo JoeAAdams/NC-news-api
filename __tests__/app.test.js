@@ -111,8 +111,18 @@ describe("/api", () => {
                     const { article } = body
                     const ArtKeys = Object.keys(article[0])
                     expect(Object.keys(article).length).toBeGreaterThan(0)
-                    expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url"]))
+                    expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url","comment_count"]))
                     expect(article[0].article_id).toBe(1)
+                    expect(article[0].comment_count).toBe("11")
+                })
+            })
+            test("article with no comments should have comment count of 0", () => {
+                return request(app)
+                .get("/api/articles/4")
+                .expect(200)
+                .then(({body}) => {
+                    const { article } = body
+                    expect(article[0].comment_count).toBe("0")
                 })
             })
             test("Returns 404 \"Not Found\" with invalid ID", () => {
