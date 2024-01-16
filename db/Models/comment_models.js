@@ -13,3 +13,8 @@ exports.createArticleComment = (id,comment) => {
     RETURNING body`,[comment.username,comment.body,id])
     .then(({rows}) => rows[0].body)
 }
+
+exports.removeComment = (id) => {
+    return db.query(`
+    DELETE FROM comments WHERE comment_id = $1`,[id])
+}
