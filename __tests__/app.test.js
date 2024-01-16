@@ -244,6 +244,15 @@ describe("/api", () => {
             })
         })
     })
+    describe("DELETE", () => {
+        describe("/comments/:comment_id", () => {
+            test("Returns status code of 204", () => {
+                return request(app)
+                .delete("/api/comments/1")
+                .expect(204)
+            })
+        })
+    })
 })
 
         //TODO: WRITE TEST FOR NO USERNAME, AND TEST FOR NO ARTICLE
