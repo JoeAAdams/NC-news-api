@@ -75,6 +75,9 @@ describe("/api", () => {
                     .then(({body}) => {
                         const { articles } = body
                         expect(articles.length).toBe(12)
+                        articles.forEach((article) => {
+                            expect(article.topic).toBe("mitch")
+                        })
                     })
                 })
                 test("Returns 404 \"Topic Not Found\" when none valid topic", ()=>{
@@ -83,6 +86,14 @@ describe("/api", () => {
                     .expect(404)
                     .then(({body}) => {
                         expect(body.msg).toBe("Topic Not Found")
+                    })
+                })
+                test("Returns empty array if no articles connected to topic", () => {
+                    return request(app)
+                    .get("/api/articles?topic=paper")
+                    .then(({body}) => {
+                        const { articles } = body
+                        expect(articles.length).toBe(0)
                     })
                 })
             })
@@ -102,7 +113,7 @@ describe("/api", () => {
                 })
             })
         })
-        describe("/articles/:id", () => {
+        describe("/articles/:article_id", () => {
             test("returns object with correct keys", () => {
                 return request(app)
                 .get("/api/articles/1")
@@ -125,7 +136,7 @@ describe("/api", () => {
                     expect(article[0].comment_count).toBe("0")
                 })
             })
-            test("Returns 404 \"Not Found\" with invalid ID", () => {
+            test("Returns 404 \"Not Found\" with non-existant ID", () => {
                 return request(app)
                 .get("/api/articles/20000")
                 .expect(404)
@@ -133,7 +144,7 @@ describe("/api", () => {
                     expect(body.msg).toBe("Not Found")
                 })
             })
-            test("Returns 400 \"Bad Request\" with non-existant ID", () => {
+            test("Returns 400 \"Bad Request\" with invalid ID", () => {
                 return request(app)
                 .get("/api/articles/notanumber")
                 .expect(400)
@@ -286,6 +297,16 @@ describe("/api", () => {
                     expect(body.msg).toBe("Bad Request")
                 })
             })
+            test("Returns 400 \"Bad Request\" with invalid ID",() => {
+                return request(app)
+                .patch("/api/articles/notanumber")
+                .send({something: "text"})
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Bad Request")
+                })
+            })
+        })
         })
     })
     describe("DELETE", () => {
@@ -296,7 +317,7 @@ describe("/api", () => {
                 .expect(204)
             })
         })
-    })
 })
+
 
         //TODO: WRITE TEST FOR NO USERNAME, AND TEST FOR NO ARTICLE
