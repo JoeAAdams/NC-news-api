@@ -67,6 +67,25 @@ describe("/api", () => {
                     expect(articles).toBeSortedBy('created_at',{descending: true})
                 })
             })
+            describe("?topic=query", () => {
+                test("Returns filted results", () => {
+                    return request(app)
+                    .get("/api/articles?topic=mitch")
+                    .expect(200)
+                    .then(({body}) => {
+                        const { articles } = body
+                        expect(articles.length).toBe(12)
+                    })
+                })
+                test("Returns 404 \"Topic Not Found\" when none valid topic", ()=>{
+                    return request(app)
+                    .get("/api/articles?topic=notarealtopic")
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Topic Not Found")
+                    })
+                })
+            })
         })
         describe("/users", () => {
             test("returns array of users with correct keys", () =>{
