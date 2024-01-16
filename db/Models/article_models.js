@@ -15,3 +15,12 @@ exports.fetchArticlesById = (id) => {
         return rows
     })
 }
+
+exports.updateArticleVotes = (id,newVote) => {
+    return db.query(`
+    UPDATE articles
+    SET  votes = votes + $1
+    WHERE article_id = $2
+    RETURNING *`,[newVote,id])
+    .then(({rows}) => rows)
+}

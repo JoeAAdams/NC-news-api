@@ -98,7 +98,7 @@ describe("/api", () => {
                 })
             })
         })
-        describe("articles/:article_id/comments", () => {
+        describe("/articles/:article_id/comments", () => {
             test("returns object with correct keys", () => {
                 return request(app)
                 .get("/api/articles/1/comments")
@@ -181,5 +181,69 @@ describe("/api", () => {
             })
         })
     })
+    describe("PATCH", () => {
+        describe("/articles/:article_id", () => {
+            test("Returns updated article with postive votes", () => {
+                return request(app)
+                .patch("/api/articles/1")
+                .send({inc_votes: 50})
+                .expect(200)
+                .then(({body}) => {
+                    const { article } = body
+                    const expectedOutput =  {
+                        article_id: 1,
+                        title: "Living in the shadow of a great man",
+                        topic: "mitch",
+                        author: "butter_bridge",
+                        body: "I find this existence challenging",
+                        created_at: "2020-07-09T20:11:00.000Z",
+                        votes: 150,
+                        article_img_url:
+                          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                      }
+                      expect(article[0]).toMatchObject(expectedOutput)
+                })
+            })
+            test("Returns updated article with negative votes", () => {
+                return request(app)
+                .patch("/api/articles/1")
+                .send({inc_votes: -50})
+                .expect(200)
+                .then(({body}) => {
+                    const { article } = body
+                    const expectedOutput =  {
+                        article_id: 1,
+                        title: "Living in the shadow of a great man",
+                        topic: "mitch",
+                        author: "butter_bridge",
+                        body: "I find this existence challenging",
+                        created_at: "2020-07-09T20:11:00.000Z",
+                        votes: 50,
+                        article_img_url:
+                          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                      }
+                      expect(article[0]).toMatchObject(expectedOutput)
+                })
+            })
+            test("Returns 404 \"Article Not Found\" with none existant article",() => {
+                return request(app)
+                .patch("/api/articles/2000000")
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Article Not Found")
+                })
+            })
+            test("Returns 400 \"Bad Request\" with incorrect input",() => {
+                return request(app)
+                .patch("/api/articles/1")
+                .send({something: "text"})
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Bad Request")
+                })
+            })
+        })
+    })
 })
+
         //TODO: WRITE TEST FOR NO USERNAME, AND TEST FOR NO ARTICLE
