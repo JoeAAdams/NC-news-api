@@ -39,17 +39,14 @@
   "GET /api/articles/:article_id": {
     "description": "serves an array of corresponding articles",
     "queries": [],
-    "exampleRequest": "N/A" ,
+    "exampleRequest": {
+      "username": "butter_bridge",
+      "body": "a new comment!"
+    } ,
     "exampleResponse": {
       "article": [
         {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
+          "body": "a new comment!"
         }
       ]
     }
@@ -66,6 +63,42 @@
           "author": "butter_bridge",
           "article_id": 9,
           "created_at": 1586179020000
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a new comment to the database with corresponding body",
+    "queries": [],
+    "exampleRequest": "N/A" ,
+    "exampleResponse": {
+      "comments": [
+        {
+          "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          "votes": 16,
+          "author": "butter_bridge",
+          "article_id": 9,
+          "created_at": 1586179020000
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates votes to corresponding article",
+    "queries": [],
+    "exampleRequest": {
+      "inc_votes": "40"
+    } ,
+    "exampleResponse": {
+      "article": [
+        {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 40,
+          "comment_count": 6
         }
       ]
     }
