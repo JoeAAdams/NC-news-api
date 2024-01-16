@@ -68,6 +68,21 @@ describe("/api", () => {
                 })
             })
         })
+        describe("/users", () => {
+            test("returns array of users with correct keys", () =>{
+                return request(app)
+                .get("/api/users")
+                .expect(200)
+                .then(({body}) => {
+                    const { users } = body
+                    expect(Object.keys(users).length).toBeGreaterThan(0)
+                    users.forEach((user) => {
+                        const userKeys = Object.keys(user)
+                        expect(userKeys).toEqual(expect.arrayContaining(["username","name","avatar_url"]))
+                    });
+                })
+            })
+        })
         describe("/articles/:id", () => {
             test("returns object with correct keys", () => {
                 return request(app)
