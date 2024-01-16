@@ -37,7 +37,7 @@
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an array of corresponding articles",
+    "description": "serves an array of corresponding articles with comment count",
     "queries": [],
     "exampleRequest": "N/A" ,
     "exampleResponse": {
