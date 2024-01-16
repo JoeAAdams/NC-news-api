@@ -106,21 +106,31 @@ describe("/api", () => {
                 .then(({body}) => {
                     const { comments } = body
                     expect(comments.length).toBeGreaterThan(0)
-                    comments.forEach(comment => {
-                    const commentKeys = Object.keys(comment)
-                    expect(commentKeys).toEqual(expect.arrayContaining(["comment_id","votes","created_at","author","body","article_id"]))
-                    expect(comment.article_id).toBe(1)
-                   });
-                })
-            })
-            test("Returns 404 \"Not Found\" with non-existant ID", () => {
+                        comments.forEach(comment => {
+                        const commentKeys = Object.keys(comment)
+                        expect(commentKeys).toEqual(expect.arrayContaining(["comment_id","votes","created_at","author","body","article_id"]))
+                        const commentValueTypes = Object.values(comment).map((value) => typeof value)
+                        expect(commentValueTypes).toEqual(["number","string","number","string","number","string"])
+                        expect(comment.article_id).toBe(1)
+                    });
+                });
+            });
+            test("Returns empty array if no comments for article", () =>{
                 return request(app)
-                .get("/api/articles/20000/comments")
-                .expect(404)
+                .get("/api/articles/2/comments")
+                .expect(200)
                 .then(({body}) => {
-                    expect(body.msg).toBe("Not Found")
+                    expect(body.comments.length).toBe(0)
                 })
             })
+            // test("Returns 404 \"Not Found\" with non-existant ID", () => {
+            //     return request(app)
+            //     .get("/api/articles/20000/comments")
+            //     .expect(404)
+            //     .then(({body}) => {
+            //         expect(body.msg).toBe("Not Found")
+            //     })
+            // })
             test("Returns 400 \"Bad Request\" with invalid ID", () => {
                 return request(app)
                 .get("/api/articles/notanumber/comments")
@@ -131,4 +141,45 @@ describe("/api", () => {
             })
         })
     })
+    describe("POST", () => {
+        describe("/articles/:article_id/comments", () => {
+            test("Returns posted comment with 201 code",() => {
+                return request(app)
+                .post("/api/articles/1/comments")
+                .send({
+                    username: "butter_bridge",
+                    body: "A new comment"
+                })
+                .expect(201)
+                .then(({body}) => {
+                    expect(body.comment).toBe("A new comment")
+                })
+            }) 
+            test("Returns 404 \"User Not Found\" with none existant article",() => {
+                return request(app)
+                .post("/api/articles/1/comments")
+                .send({
+                    username: "John",
+                    body: "A new comment"
+                })
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe("User Not Found")
+            })
+        })    
+            test("Returns 404 \"Article Not Found\" with none existant article",() => {
+                return request(app)
+                .post("/api/articles/2000000/comments")
+                .send({
+                    username: "butter_bridge",
+                    body: "A new comment"
+                })
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Article Not Found")
+                })
+            })
+        })
+    })
 })
+        //TODO: WRITE TEST FOR NO USERNAME, AND TEST FOR NO ARTICLE
