@@ -2,12 +2,12 @@ const { fetchArticlesById, fetchArticles,  updateArticleVotes } = require("../Mo
 const { checkArticleExists, checkTopicExists } = require("../Models/util_models")
 
 exports.getArticles = (req,res,next) => {
-    const { topic } = req.query
+    const queries = { topic, sort_by, order } = req.query
     let topicExistsQuery = true
     if (topic) {
         topicExistsQuery = checkTopicExists(topic)
     }
-    const articleQuery = fetchArticles(topic)
+    const articleQuery = fetchArticles(queries)
     Promise.all([articleQuery,topicExistsQuery])
     .then((response) => {
         const articles = response[0]

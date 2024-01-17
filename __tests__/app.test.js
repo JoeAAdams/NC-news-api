@@ -97,6 +97,60 @@ describe("/api", () => {
                     })
                 })
             })
+            describe("?sort_by=query", () => {
+                test('Returns sorted list', () => {
+                    return request(app)
+                    .get("/api/articles?sort_by=title")
+                    .expect(200)
+                    .then(({body}) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy("title", {descending: true})
+                    })
+                })
+                test('Return 400 \"Bad Request\" if invalid query', () => {
+                    return request(app)
+                    .get("/api/articles/sort_by=notacollumn")
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                });
+                test('Prevents SQL injection', () => {
+                    return request(app)
+                    .get("/api/articles/sort_by=title;DELETE * FROM articles;")
+                    .expect(400)
+                    .then(({body})=>{
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                });
+            })
+            describe('?order=query', () => {
+                test('Returns ordered list ascending', () => {
+                    return request(app)
+                    .get("/api/articles?order=asc")
+                    .expect(200)
+                    .then(({body}) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy("created_at", {ascending: true})
+                    })
+                })
+                test('Return 400 \"Bad Request\" if invalid query', () => {
+                    return request(app)
+                    .get("/api/articles/order=helloworld")
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                });
+                test('Prevents SQL injection', () => {
+                    return request(app)
+                    .get("/api/articles/order=asc;DELETE * FROM articles;")
+                    .expect(400)
+                    .then(({body})=>{
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                });
+            });
         })
         describe("/users", () => {
             test("returns array of users with correct keys", () =>{
