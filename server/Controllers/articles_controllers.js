@@ -1,4 +1,4 @@
-const { fetchArticlesById, fetchArticles,  updateArticleVotes } = require("../Models/article_models")
+const { fetchArticlesById, fetchArticles,  updateArticleVotes, createArticle } = require("../Models/article_models")
 const { checkArticleExists, checkTopicExists } = require("../Models/util_models")
 
 exports.getArticles = (req,res,next) => {
@@ -33,6 +33,14 @@ exports.patchArticleVotes = (req,res,next) => {
     .then((response) => {
         article = response[0]
         res.status(200).send({ article })
+    })
+    .catch((err) => next(err))
+}
+
+exports.postArticle = (req,res,next) => {
+    const post = req.body
+    createArticle(post).then((article) => {
+        res.status(201).send({article})
     })
     .catch((err) => next(err))
 }

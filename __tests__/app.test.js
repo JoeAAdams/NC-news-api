@@ -274,43 +274,97 @@ describe("/api", () => {
         })
     })
     describe("POST", () => {
-        describe("/articles/:article_id/comments", () => {
-            test("Returns posted comment with 201 code",() => {
+        describe("/articles", () => {
+            test('Return added article with correct keys', () => {
                 return request(app)
-                .post("/api/articles/1/comments")
+                .post('/api/articles')
                 .send({
-                    username: "butter_bridge",
-                    body: "A new comment"
+                    author: "butter_bridge",
+                    title: "A title",
+                    body: "A body",
+                    topic: "cats",
+                    article_img_url: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nationalgeographic.com%2Fanimals%2Fmammals%2Ffacts%2Fdomestic-cat&psig=AOvVaw0WVD3FM7nIYyplKwsFlkkC&ust=1705678474611000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCNCzqNuh54MDFQAAAAAdAAAAABAD"
                 })
                 .expect(201)
-                .then(({body}) => {
-                    expect(body.comment).toBe("A new comment")
-                })
-            }) 
-            test("Returns 404 \"User Not Found\" with none existant article",() => {
+                .then(({body}) =>{
+                    const { article } = body
+                    const ArtKeys = Object.keys(article)
+                    expect(Object.keys(article).length).toBeGreaterThan(0)
+                    expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url","comment_count"]))
+                    expect(article.article_img_url).toBe("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nationalgeographic.com%2Fanimals%2Fmammals%2Ffacts%2Fdomestic-cat&psig=AOvVaw0WVD3FM7nIYyplKwsFlkkC&ust=1705678474611000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCNCzqNuh54MDFQAAAAAdAAAAABAD")
+                    expect(article.article_id).toBe(14)
+                    expect(article.comment_count).toBe(0)
+                }) 
+            });
+            test('Return added article with default img when none provided', () => {
                 return request(app)
-                .post("/api/articles/1/comments")
+                .post('/api/articles')
                 .send({
-                    username: "John",
-                    body: "A new comment"
+                    author: "butter_bridge",
+                    title: "A title",
+                    body: "A body",
+                    topic: "cats",
                 })
-                .expect(404)
-                .then(({body}) => {
-                    expect(body.msg).toBe("User Not Found")
-            })
-        })    
-            test("Returns 404 \"Article Not Found\" with none existant article",() => {
+                .expect(201)
+                .then(({body}) =>{
+                    const { article } = body
+                    expect(article.article_img_url).toBe("https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700")
+                }) 
+            });
+            test('Return 400 \'Bad Request\' when missing properties in request', () => {
                 return request(app)
-                .post("/api/articles/2000000/comments")
+                .post('/api/articles')
                 .send({
-                    username: "butter_bridge",
-                    body: "A new comment"
+                    author: "butter_bridge",
+                    title: "A title",
+                    topic: "cats",
+                    article_img_url: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nationalgeographic.com%2Fanimals%2Fmammals%2Ffacts%2Fdomestic-cat&psig=AOvVaw0WVD3FM7nIYyplKwsFlkkC&ust=1705678474611000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCNCzqNuh54MDFQAAAAAdAAAAABAD"
                 })
-                .expect(404)
+                .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe("Article Not Found")
+                    expect(body.msg).toBe('Bad Request')
                 })
-            })
+            });
+            describe('/:article_id', () => {
+                describe('/comments', () => {
+                    test("Returns posted comment with 201 code",() => {
+                        return request(app)
+                        .post("/api/articles/1/comments")
+                        .send({
+                            username: "butter_bridge",
+                            body: "A new comment"
+                        })
+                        .expect(201)
+                        .then(({body}) => {
+                            expect(body.comment).toBe("A new comment")
+                        })
+                    }) 
+                    test("Returns 404 \"User Not Found\" with none existant article",() => {
+                        return request(app)
+                        .post("/api/articles/1/comments")
+                        .send({
+                            username: "John",
+                            body: "A new comment"
+                        })
+                        .expect(404)
+                        .then(({body}) => {
+                            expect(body.msg).toBe("User Not Found")
+                    })
+                    })    
+                    test("Returns 404 \"Article Not Found\" with none existant article",() => {
+                        return request(app)
+                        .post("/api/articles/2000000/comments")
+                        .send({
+                            username: "butter_bridge",
+                            body: "A new comment"
+                        })
+                        .expect(404)
+                        .then(({body}) => {
+                            expect(body.msg).toBe("Article Not Found")
+                        })
+                    })
+                });
+            });
         })
     })
     describe("PATCH", () => {

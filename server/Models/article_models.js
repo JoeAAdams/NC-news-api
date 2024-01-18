@@ -48,3 +48,19 @@ exports.updateArticleVotes = (id,newVote) => {
     RETURNING *`,[newVote,id])
     .then(({rows}) => rows)
 }
+
+exports.createArticle = (post) => {
+    const params = [post.author,post.title,post.body,post.topic]
+    let values = `$1,$2,$3,$4`
+    let query =`INSERT INTO articles (author,title,body,topic`
+    if(post.article_img_url) { //adds new paramter and value if article_img_url is provided
+        params.push(post.article_img_url)
+        query += `, article_img_url`
+        values += `,$5`
+    }
+    query += `)
+    VALUES (${values})
+    RETURNING article_id`
+    return db.query(query,params)
+    .then(({rows}) => this.fetchArticlesById(rows[0].article_id).then((data) => data[0]))
+}
