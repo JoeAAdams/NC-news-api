@@ -1,12 +1,7 @@
 const express = require('express');
-const { getTopics } = require('./Controllers/topics _controllers');
-const { getEndpoints } = require('./Controllers/util_controllers');
-const { getArticlesById, getArticles, patchArticleVotes } = require('./Controllers/articles_controllers');
-const { postArticleComment, getArticleComments, deleteComment } = require('./Controllers/comment_controllers');
-const { getUsers } = require('./Controllers/user_controllers');
 const apiRouter = require('./routes/api');
 const app = express();
-const router = express.Router()
+
 
 app.use(express.json())
 
