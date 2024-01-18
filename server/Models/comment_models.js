@@ -1,4 +1,4 @@
-const db = require("../connection")
+const db = require("../../db/connection")
 
 exports.fetchArticleComments = (id) => {
     return db.query(`SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC`,[id]).then(({rows}) => {

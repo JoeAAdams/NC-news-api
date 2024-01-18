@@ -1,5 +1,5 @@
 const request = require("supertest")
-const app = require("../db/app")
+const app = require("../server/app")
 const seed = require("../db/seeds/seed")
 const data = require("../db/data/test-data")
 const db = require("../db/connection")
@@ -178,7 +178,7 @@ describe("/api", () => {
                     expect(Object.keys(article).length).toBeGreaterThan(0)
                     expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url","comment_count"]))
                     expect(article[0].article_id).toBe(1)
-                    expect(article[0].comment_count).toBe("11")
+                    expect(article[0].comment_count).toBe(11)
                 })
             })
             test("article with no comments should have comment count of 0", () => {
@@ -187,7 +187,7 @@ describe("/api", () => {
                 .expect(200)
                 .then(({body}) => {
                     const { article } = body
-                    expect(article[0].comment_count).toBe("0")
+                    expect(article[0].comment_count).toBe(0)
                 })
             })
             test("Returns 404 \"Not Found\" with non-existant ID", () => {

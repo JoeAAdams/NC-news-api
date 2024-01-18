@@ -3,7 +3,7 @@ const { checkArticleExists, checkTopicExists } = require("../Models/util_models"
 
 exports.getArticles = (req,res,next) => {
     const queries = { topic, sort_by, order } = req.query
-    let topicExistsQuery = true
+    let topicExistsQuery = true //Makes Promise.all pass when no topic 
     if (topic) {
         topicExistsQuery = checkTopicExists(topic)
     }
