@@ -57,6 +57,7 @@ describe("/api", () => {
                         expect(ArtKeys).not.toContain("body")
                     });
                 })
+                
             })
             test("should be sorted by date descending", () =>{
                 return request(app)
@@ -151,7 +152,90 @@ describe("/api", () => {
                     })
                 });
             });
-        })
+            describe("/:article_id", () => {
+                test("returns object with correct keys", () => {
+                    return request(app)
+                    .get("/api/articles/1")
+                    .expect(200)
+                    .then(({body}) => {
+                        const { article } = body
+                        const ArtKeys = Object.keys(article[0])
+                        expect(Object.keys(article).length).toBeGreaterThan(0)
+                        expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url","comment_count"]))
+                        expect(article[0].article_id).toBe(1)
+                        expect(article[0].comment_count).toBe(11)
+                    })
+                })
+                test("article with no comments should have comment count of 0", () => {
+                    return request(app)
+                    .get("/api/articles/4")
+                    .expect(200)
+                    .then(({body}) => {
+                        const { article } = body
+                        expect(article[0].comment_count).toBe(0)
+                    })
+                })
+                test("Returns 404 \"Not Found\" with non-existant ID", () => {
+                    return request(app)
+                    .get("/api/articles/20000")
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Not Found")
+                    })
+                })
+                test("Returns 400 \"Bad Request\" with invalid ID", () => {
+                    return request(app)
+                    .get("/api/articles/notanumber")
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                })
+                describe("/comments", () => {
+                    test("returns object with correct keys", () => {
+                        return request(app)
+                        .get("/api/articles/1/comments")
+                        .expect(200)
+                        .then(({body}) => {
+                            const { comments } = body
+                            expect(comments.length).toBeGreaterThan(0)
+                                comments.forEach(comment => {
+                                const commentKeys = Object.keys(comment)
+                                expect(commentKeys).toEqual(expect.arrayContaining(["comment_id","votes","created_at","author","body","article_id"]))
+                                const commentValueTypes = Object.values(comment).map((value) => typeof value)
+                                expect(commentValueTypes).toEqual(["number","string","number","string","number","string"])
+                                expect(comment.article_id).toBe(1)
+                            });
+                        });
+                    });
+                    test("Returns empty array if no comments for article", () =>{
+                        return request(app)
+                        .get("/api/articles/2/comments")
+                        .expect(200)
+                        .then(({body}) => {
+                            expect(body.comments.length).toBe(0)
+                        })
+                    })
+                    // test("Returns 404 \"Not Found\" with non-existant ID", () => {
+                    //     return request(app)
+                    //     .get("/api/articles/20000/comments")
+                    //     .expect(404)
+                    //     .then(({body}) => {
+                    //         expect(body.msg).toBe("Not Found")
+                    //     })
+                    // })
+                    test("Returns 400 \"Bad Request\" with invalid ID", () => {
+                        return request(app)
+                        .get("/api/articles/notanumber/comments")
+                        .expect(400)
+                        .then(({body}) => {
+                            expect(body.msg).toBe("Bad Request")
+                        })
+                    })
+                })
+            })
+            })
+
         describe("/users", () => {
             test("returns array of users with correct keys", () =>{
                 return request(app)
@@ -166,89 +250,29 @@ describe("/api", () => {
                     });
                 })
             })
-        })
-        describe("/articles/:article_id", () => {
-            test("returns object with correct keys", () => {
-                return request(app)
-                .get("/api/articles/1")
-                .expect(200)
-                .then(({body}) => {
-                    const { article } = body
-                    const ArtKeys = Object.keys(article[0])
-                    expect(Object.keys(article).length).toBeGreaterThan(0)
-                    expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","body","topic","created_at","votes","article_img_url","comment_count"]))
-                    expect(article[0].article_id).toBe(1)
-                    expect(article[0].comment_count).toBe(11)
+            describe('/:username', () => {
+                test("returns object with correct keys", () => {
+                    return request(app)
+                    .get("/api/users/butter_bridge")
+                    .expect(200)
+                    .then(({body}) => {
+                        const { user } = body
+                        const userKeys = Object.keys(user[0])
+                        expect(Object.keys(user).length).toBeGreaterThan(0)
+                        expect(userKeys).toEqual(expect.arrayContaining(["username","avatar_url","name"]))
+                        expect(user[0].username).toBe('butter_bridge')
+                    })
+                })
+                test("Returns 404 \"Not Found\" with non-existant ID", () => {
+                    return request(app)
+                    .get("/api/users/thisuserisntreal")
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Not Found")
+                    })
                 })
             })
-            test("article with no comments should have comment count of 0", () => {
-                return request(app)
-                .get("/api/articles/4")
-                .expect(200)
-                .then(({body}) => {
-                    const { article } = body
-                    expect(article[0].comment_count).toBe(0)
-                })
-            })
-            test("Returns 404 \"Not Found\" with non-existant ID", () => {
-                return request(app)
-                .get("/api/articles/20000")
-                .expect(404)
-                .then(({body}) => {
-                    expect(body.msg).toBe("Not Found")
-                })
-            })
-            test("Returns 400 \"Bad Request\" with invalid ID", () => {
-                return request(app)
-                .get("/api/articles/notanumber")
-                .expect(400)
-                .then(({body}) => {
-                    expect(body.msg).toBe("Bad Request")
-                })
-            })
-        })
-        describe("/articles/:article_id/comments", () => {
-            test("returns object with correct keys", () => {
-                return request(app)
-                .get("/api/articles/1/comments")
-                .expect(200)
-                .then(({body}) => {
-                    const { comments } = body
-                    expect(comments.length).toBeGreaterThan(0)
-                        comments.forEach(comment => {
-                        const commentKeys = Object.keys(comment)
-                        expect(commentKeys).toEqual(expect.arrayContaining(["comment_id","votes","created_at","author","body","article_id"]))
-                        const commentValueTypes = Object.values(comment).map((value) => typeof value)
-                        expect(commentValueTypes).toEqual(["number","string","number","string","number","string"])
-                        expect(comment.article_id).toBe(1)
-                    });
-                });
-            });
-            test("Returns empty array if no comments for article", () =>{
-                return request(app)
-                .get("/api/articles/2/comments")
-                .expect(200)
-                .then(({body}) => {
-                    expect(body.comments.length).toBe(0)
-                })
-            })
-            // test("Returns 404 \"Not Found\" with non-existant ID", () => {
-            //     return request(app)
-            //     .get("/api/articles/20000/comments")
-            //     .expect(404)
-            //     .then(({body}) => {
-            //         expect(body.msg).toBe("Not Found")
-            //     })
-            // })
-            test("Returns 400 \"Bad Request\" with invalid ID", () => {
-                return request(app)
-                .get("/api/articles/notanumber/comments")
-                .expect(400)
-                .then(({body}) => {
-                    expect(body.msg).toBe("Bad Request")
-                })
-            })
-        })
+        });
     })
     describe("POST", () => {
         describe("/articles/:article_id/comments", () => {
@@ -361,17 +385,14 @@ describe("/api", () => {
                 })
             })
         })
-        })
     })
     describe("DELETE", () => {
-        describe("/comments/:comment_id", () => {
-            test("Returns status code of 204", () => {
-                return request(app)
-                .delete("/api/comments/1")
-                .expect(204)
+            describe("/comments/:comment_id", () => {
+                test("Returns status code of 204", () => {
+                    return request(app)
+                    .delete("/api/comments/1")
+                    .expect(204)
+                })
             })
-        })
+    })
 })
-
-
-        //TODO: WRITE TEST FOR NO USERNAME, AND TEST FOR NO ARTICLE
