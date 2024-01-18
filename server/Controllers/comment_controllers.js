@@ -1,4 +1,4 @@
-const { fetchArticleComments, createArticleComment, removeComment } = require("../Models/comment_models")
+const { fetchArticleComments, createArticleComment, removeComment, updateCommentVotes } = require("../Models/comment_models")
 const { checkUserExists, checkArticleExists } = require("../Models/util_models")
 
 exports.getArticleComments = (req,res,next) => {
@@ -28,4 +28,14 @@ exports.deleteComment = (req,res,next) => {
     removeComment(comment_id).then(() => {
         res.status(204).send()
     })
+}
+
+exports.patchCommentVotes = (req,res,next) => {
+    const { comment_id } = req.params
+    const { inc_votes } = req.body
+    return updateCommentVotes(comment_id,inc_votes)
+    .then((comment) => {
+        res.status(200).send({ comment })
+    })
+    .catch((err) => next(err))
 }

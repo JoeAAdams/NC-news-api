@@ -234,8 +234,7 @@ describe("/api", () => {
                     })
                 })
             })
-            })
-
+        })
         describe("/users", () => {
             test("returns array of users with correct keys", () =>{
                 return request(app)
@@ -272,7 +271,7 @@ describe("/api", () => {
                     })
                 })
             })
-        });
+        })
     })
     describe("POST", () => {
         describe("/articles/:article_id/comments", () => {
@@ -315,76 +314,142 @@ describe("/api", () => {
         })
     })
     describe("PATCH", () => {
-        describe("/articles/:article_id", () => {
-            test("Returns updated article with postive votes", () => {
-                return request(app)
-                .patch("/api/articles/1")
-                .send({inc_votes: 50})
-                .expect(200)
-                .then(({body}) => {
-                    const { article } = body
-                    const expectedOutput =  {
-                        article_id: 1,
-                        title: "Living in the shadow of a great man",
-                        topic: "mitch",
-                        author: "butter_bridge",
-                        body: "I find this existence challenging",
-                        created_at: "2020-07-09T20:11:00.000Z",
-                        votes: 150,
-                        article_img_url:
-                          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-                      }
-                      expect(article[0]).toMatchObject(expectedOutput)
+        describe("/articles", () => {
+            describe('/:article_id', () => {
+                test("Returns updated article with postive votes", () => {
+                    return request(app)
+                    .patch("/api/articles/1")
+                    .send({inc_votes: 50})
+                    .expect(200)
+                    .then(({body}) => {
+                        const { article } = body
+                        const expectedOutput =  {
+                            article_id: 1,
+                            title: "Living in the shadow of a great man",
+                            topic: "mitch",
+                            author: "butter_bridge",
+                            body: "I find this existence challenging",
+                            created_at: "2020-07-09T20:11:00.000Z",
+                            votes: 150,
+                            article_img_url:
+                              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                          }
+                          expect(article[0]).toMatchObject(expectedOutput)
+                    })
                 })
-            })
-            test("Returns updated article with negative votes", () => {
-                return request(app)
-                .patch("/api/articles/1")
-                .send({inc_votes: -50})
-                .expect(200)
-                .then(({body}) => {
-                    const { article } = body
-                    const expectedOutput =  {
-                        article_id: 1,
-                        title: "Living in the shadow of a great man",
-                        topic: "mitch",
-                        author: "butter_bridge",
-                        body: "I find this existence challenging",
-                        created_at: "2020-07-09T20:11:00.000Z",
-                        votes: 50,
-                        article_img_url:
-                          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-                      }
-                      expect(article[0]).toMatchObject(expectedOutput)
+                test("Returns updated article with negative votes", () => {
+                    return request(app)
+                    .patch("/api/articles/1")
+                    .send({inc_votes: -50})
+                    .expect(200)
+                    .then(({body}) => {
+                        const { article } = body
+                        const expectedOutput =  {
+                            article_id: 1,
+                            title: "Living in the shadow of a great man",
+                            topic: "mitch",
+                            author: "butter_bridge",
+                            body: "I find this existence challenging",
+                            created_at: "2020-07-09T20:11:00.000Z",
+                            votes: 50,
+                            article_img_url:
+                              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                          }
+                          expect(article[0]).toMatchObject(expectedOutput)
+                    })
                 })
-            })
-            test("Returns 404 \"Article Not Found\" with none existant article",() => {
-                return request(app)
-                .patch("/api/articles/2000000")
-                .expect(404)
-                .then(({body}) => {
-                    expect(body.msg).toBe("Article Not Found")
+                test("Returns 404 \"Article Not Found\" with none existant article",() => {
+                    return request(app)
+                    .patch("/api/articles/2000000")
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Article Not Found")
+                    })
                 })
-            })
-            test("Returns 400 \"Bad Request\" with incorrect input",() => {
-                return request(app)
-                .patch("/api/articles/1")
-                .send({something: "text"})
-                .expect(400)
-                .then(({body}) => {
-                    expect(body.msg).toBe("Bad Request")
+                test("Returns 400 \"Bad Request\" with incorrect input",() => {
+                    return request(app)
+                    .patch("/api/articles/1")
+                    .send({something: "text"})
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
                 })
-            })
-            test("Returns 400 \"Bad Request\" with invalid ID",() => {
-                return request(app)
-                .patch("/api/articles/notanumber")
-                .send({something: "text"})
-                .expect(400)
-                .then(({body}) => {
-                    expect(body.msg).toBe("Bad Request")
-                })
-            })
+                test("Returns 400 \"Bad Request\" with invalid ID",() => {
+                    return request(app)
+                    .patch("/api/articles/notanumber")
+                    .send({something: "text"})
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                })           
+            });
         })
+        describe('/comments', () => {
+            describe('/:comment_id', () => {
+                test("Returns updated comment with postive votes", () => {
+                    return request(app)
+                    .patch("/api/comments/1")
+                    .send({inc_votes: 50})
+                    .expect(200)
+                    .then(({body}) => {
+                        const { comment } = body
+                        const expectedOutput =    {
+                            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                            votes: 66,
+                            author: "butter_bridge",
+                            article_id: 9,
+                            created_at: "2020-04-06T12:17:00.000Z",
+                          }
+                          expect(comment[0]).toMatchObject(expectedOutput)
+                    })
+                })
+                test("Returns updated comment with negative votes", () => {
+                    return request(app)
+                    .patch("/api/comments/1")
+                    .send({inc_votes: -50})
+                    .expect(200)
+                    .then(({body}) => {
+                        const { comment } = body
+                        const expectedOutput =    {
+                            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                            votes: -34,
+                            author: "butter_bridge",
+                            article_id: 9,
+                            created_at: "2020-04-06T12:17:00.000Z",
+                          }
+                          expect(comment[0]).toMatchObject(expectedOutput)
+                    })
+                })
+                test("Returns 404 \"Not Found\" with none existant comment",() => {
+                    return request(app)
+                    .patch("/api/comments/2000000")
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Not Found")
+                    })
+                })
+                test("Returns 400 \"Bad Request\" with incorrect input",() => {
+                    return request(app)
+                    .patch("/api/comments/1")
+                    .send({something: "text"})
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                })
+                test("Returns 400 \"Bad Request\" with invalid ID",() => {
+                    return request(app)
+                    .patch("/api/comments/notanumber")
+                    .send({inc_votes: 30})
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request")
+                    })
+                })
+            });
+        });
     })
     describe("DELETE", () => {
             describe("/comments/:comment_id", () => {
