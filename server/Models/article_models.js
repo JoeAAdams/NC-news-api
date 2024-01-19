@@ -65,3 +65,9 @@ exports.createArticle = (post) => {
     return db.query(query,params)
     .then(({rows}) => this.fetchArticlesById(rows[0].article_id).then((data) => data[0]))
 }
+
+exports.removeArticle = (id) => {
+    console.log(id)
+    return db.query(`
+    DELETE FROM articles WHERE article_id = $1`,[id])
+}

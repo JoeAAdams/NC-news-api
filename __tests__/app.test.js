@@ -696,12 +696,29 @@ describe("/api", () => {
         });
     })
     describe("DELETE", () => {
-            describe("/comments/:comment_id", () => {
+        describe("/comments", () => {
+            describe('/:comment_id', () => {
                 test("Returns status code of 204", () => {
                     return request(app)
                     .delete("/api/comments/1")
                     .expect(204)
                 })
-            })
+            });
+        })
+        describe('/articles', () => {
+            describe('/:article_id', () => {
+                test('Delete all child comments and return code 204', () => {
+                    return request(app)
+                    .delete("/api/articles/1")
+                    .expect(204)
+                    .then(() => {
+                        return db.query(`SELECT * FROM comments WHERE article_id = 1`)
+                        .then(({rows}) =>{
+                            expect(rows).toHaveLength(0);
+                        })
+                    })
+                });
+            });
+        });
     })
 })
