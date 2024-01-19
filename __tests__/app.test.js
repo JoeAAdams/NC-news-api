@@ -525,6 +525,37 @@ describe("/api", () => {
                 });
             });
         })
+        describe('/topics', () => {
+            test('Returns newly added object', () => {
+                return request(app)
+                .post('/api/topics')
+                .send({
+                    "slug": "topic name here",
+                    "description": "description here"
+                })
+                .expect(201)
+                .then(({body}) => {
+                    const {topic} = body
+                    const expected = {
+                        "slug": "topic name here",
+                        "description": "description here"
+                    }
+                    expect(topic).toMatchObject(expected);
+                })
+            });
+            test('Returns 400 "Bad Request" with invalid input', () => {
+                return request(app)
+                .post('/api/topics')
+                .send({
+                    "slug": "topic name here",
+                    "awawfawfawf": "description here"
+                })
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe("Bad Request");
+                })
+            })         
+        });
     })
     describe("PATCH", () => {
         describe("/articles", () => {
