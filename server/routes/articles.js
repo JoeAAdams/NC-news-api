@@ -13,6 +13,6 @@ articleRouter
 
 articleRouter
     .get('/:article_id/comments', getArticleComments)
-    .post('/:article_id/comments',postArticleComment)
+    .post('/:article_id/comments', postArticleComment)
 
 module.exports = articleRouter

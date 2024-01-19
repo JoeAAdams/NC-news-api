@@ -1,7 +1,12 @@
 const db = require("../../db/connection")
 
-exports.fetchArticleComments = (id) => {
-    return db.query(`SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC`,[id]).then(({rows}) => {
+exports.fetchArticleComments = (id,{limit=10,p=1}) => {
+    if(/\D/.test(limit) || /\D/.test(p)) return Promise.reject({status: 400, msg: "Bad Request"})
+    return db.query(`
+    SELECT * FROM comments 
+    WHERE article_id=$1 
+    ORDER BY created_at DESC
+    LIMIT ${limit} OFFSET ${(p -1) * 5}`,[id]).then(({rows}) => {
         return rows
     })
 }

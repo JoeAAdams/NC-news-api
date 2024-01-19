@@ -56,8 +56,7 @@ describe("/api", () => {
                         expect(ArtKeys).toEqual(expect.arrayContaining(["author","title","article_id","comment_count","topic","created_at","votes","article_img_url"]))
                         expect(ArtKeys).not.toContain("body")
                     });
-                })
-                
+                })           
             })
             test("should be sorted by date descending", () =>{
                 return request(app)
@@ -68,10 +67,99 @@ describe("/api", () => {
                     expect(articles).toBeSortedBy('created_at',{descending: true})
                 })
             })
-            describe("?topic=query", () => {
-                test("Returns filted results", () => {
+            describe('?limit=value', () => {
+                test('Return paginated result', () => {
                     return request(app)
-                    .get("/api/articles?topic=mitch")
+                    .get("/api/articles?limit=5")
+                    .expect(200)
+                    .then(({body}) => {
+                        expect(body.articles).toHaveLength(5);
+                    })
+                });
+                test('Return 400 "Bad Request" with invalid query', () => {
+                    return request(app)
+                    .get("/api/articles?limit=notanumber")
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request");
+                    })
+                })
+            });
+            describe('?p=value', () => {
+                test('Return correct page', () => {
+                    return request(app)
+                    .get("/api/articles?p=2&limit=5")
+                    .expect(200)
+                    .then(({body}) => {
+                        const  { articles } = body
+                        const expected = [
+                            {
+                                author: 'rogersop',
+                                title: 'UNCOVERED: catspiracy to bring down democracy',
+                                article_id: 5,
+                                topic: 'cats',
+                                created_at: '2020-08-03T13:14:00.000Z',
+                                votes: 0,
+                                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                                comment_count: '2'
+                            },
+                            {
+                                author: 'butter_bridge',
+                                title: 'Living in the shadow of a great man',
+                                article_id: 1,
+                                topic: 'mitch',
+                                created_at: '2020-07-09T20:11:00.000Z',
+                                votes: 100,
+                                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                                comment_count: '11'
+                            },
+                            {
+                                author: 'butter_bridge',
+                                title: "They're not exactly dogs, are they?",
+                                article_id: 9,
+                                topic: 'mitch',
+                                created_at: '2020-06-06T09:10:00.000Z',
+                                votes: 0,
+                                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                                comment_count: '2'
+                            },
+                            {
+                                author: 'rogersop',
+                                title: 'Seven inspirational thought leaders from Manchester UK',
+                                article_id: 10,
+                                topic: 'mitch',
+                                created_at: '2020-05-14T04:15:00.000Z',
+                                votes: 0,
+                                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                                comment_count: '0'
+                            },
+                            {
+                                author: 'rogersop',
+                                title: 'Student SUES Mitch!',
+                                article_id: 4,
+                                topic: 'mitch',
+                                created_at: '2020-05-06T01:14:00.000Z',
+                                votes: 0,
+                                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+                                comment_count: '0'
+                            }
+                        ]
+                        expect(articles).toMatchObject(expected);
+                    })
+                });
+                test('Return 400 "Bad Request" with invalid query', () => {
+                    return request(app)
+                    .get("/api/articles?limit=notanumber")
+                    .expect(400)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Bad Request");
+                    })
+                })
+            });
+            describe("?topic=query", () => {
+                test("Returns filted results, paginated to 10", () => {
+                    return request(app)
+                    .get("/api/articles?topic=mitch&limit=15")
                     .expect(200)
                     .then(({body}) => {
                         const { articles } = body
@@ -216,14 +304,6 @@ describe("/api", () => {
                             expect(body.comments.length).toBe(0)
                         })
                     })
-                    // test("Returns 404 \"Not Found\" with non-existant ID", () => {
-                    //     return request(app)
-                    //     .get("/api/articles/20000/comments")
-                    //     .expect(404)
-                    //     .then(({body}) => {
-                    //         expect(body.msg).toBe("Not Found")
-                    //     })
-                    // })
                     test("Returns 400 \"Bad Request\" with invalid ID", () => {
                         return request(app)
                         .get("/api/articles/notanumber/comments")
@@ -232,6 +312,85 @@ describe("/api", () => {
                             expect(body.msg).toBe("Bad Request")
                         })
                     })
+                    describe('?limit=value', () => {
+                        test('Return paginated result', () => {
+                            return request(app)
+                            .get("/api/articles/1/comments?limit=5")
+                            .expect(200)
+                            .then(({body}) => {
+                                expect(body.comments).toHaveLength(5);
+                            })
+                        });
+                        test('Return 400 "Bad Request" with invalid query', () => {
+                            return request(app)
+                            .get("/api/articles/1/comments?limit=notanumber")
+                            .expect(400)
+                            .then(({body}) => {
+                                expect(body.msg).toBe("Bad Request");
+                            })
+                        })
+                    });
+                    describe('?p=value', () => {
+                        test('Return correct page', () => {
+                            return request(app)
+                            .get("/api/articles/1/comments?limit=5&p=2")
+                            .expect(200)
+                            .then(({body}) => {
+                                const  { comments } = body
+                                const expected = [
+                                    {
+                                        comment_id: 8,
+                                        body: 'Delicious crackerbreads',
+                                        article_id: 1,
+                                        author: 'icellusedkars',
+                                        votes: 0,
+                                        created_at: '2020-04-14T20:19:00.000Z'
+                                      },
+                                      {
+                                        comment_id: 6,
+                                        body: 'I hate streaming eyes even more',
+                                        article_id: 1,
+                                        author: 'icellusedkars',
+                                        votes: 0,
+                                        created_at: '2020-04-11T21:02:00.000Z'
+                                      },
+                                      {
+                                        comment_id: 12,
+                                        body: 'Massive intercranial brain haemorrhage',
+                                        article_id: 1,
+                                        author: 'icellusedkars',
+                                        votes: 0,
+                                        created_at: '2020-03-02T07:10:00.000Z'
+                                      },
+                                      {
+                                        comment_id: 3,
+                                        body: 'Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.',
+                                        article_id: 1,
+                                        author: 'icellusedkars',
+                                        votes: 100,
+                                        created_at: '2020-03-01T01:13:00.000Z'
+                                      },
+                                      {
+                                        comment_id: 4,
+                                        body: ' I carry a log — yes. Is it funny to you? It is not to me.',
+                                        article_id: 1,
+                                        author: 'icellusedkars',
+                                        votes: -100,
+                                        created_at: '2020-02-23T12:01:00.000Z'
+                                      }
+                                ]
+                                expect(comments).toMatchObject(expected);
+                            })
+                        });
+                        test('Return 400 "Bad Request" with invalid query', () => {
+                            return request(app)
+                            .get("/api/articles/1/comments?p=notanumber")
+                            .expect(400)
+                            .then(({body}) => {
+                                expect(body.msg).toBe("Bad Request");
+                            })
+                        })
+                    });
                 })
             })
         })

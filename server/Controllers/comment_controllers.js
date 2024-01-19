@@ -3,7 +3,8 @@ const { checkUserExists, checkArticleExists } = require("../Models/util_models")
 
 exports.getArticleComments = (req,res,next) => {
     const { article_id } = req.params
-    fetchArticleComments(article_id).then((comments) => {
+    const queries = {limit,p} = req.query
+    fetchArticleComments(article_id,queries).then((comments) => {
         res.status(200).send({ comments })
     })
     .catch((err) => next(err))

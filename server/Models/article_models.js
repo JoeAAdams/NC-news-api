@@ -1,11 +1,11 @@
 const db = require("../../db/connection")
 
-exports.fetchArticles = ({topic, sort_by="created_at",order="desc"}) => {
+exports.fetchArticles = ({topic, sort_by="created_at",order="desc",limit = 10, p=1}) => {
     const validSorts = ["title","topic","author","body","created_at","votes","article_img_url"]
     const validOrders = ["asc","desc"]
     const args =[]
 
-    if (!validSorts.includes(sort_by) || !validOrders.includes(order)) {
+    if (!validSorts.includes(sort_by) || !validOrders.includes(order) || /\D/.test(limit) || /\D/.test(p)) {
         return Promise.reject({status: 400, msg: "Bad Request"})
     }
     
@@ -20,7 +20,8 @@ exports.fetchArticles = ({topic, sort_by="created_at",order="desc"}) => {
     
     query += `    
     GROUP BY articles.article_id
-    ORDER BY articles.${sort_by} ${order}`
+    ORDER BY articles.${sort_by} ${order}
+    LIMIT ${limit} OFFSET ${(p -1) * 5}`;
 
     return db.query(query,args).then(({rows}) => rows)
 }
