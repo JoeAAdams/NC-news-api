@@ -21,7 +21,7 @@ exports.fetchArticles = ({topic, sort_by="created_at",order="desc",limit = 10, p
     query += `    
     GROUP BY articles.article_id
     ORDER BY articles.${sort_by} ${order}
-    LIMIT ${limit} OFFSET ${(p -1) * 5}`;
+    LIMIT ${limit} OFFSET ${(p -1) * limit}`;
 
     return db.query(query,args).then(({rows}) => rows)
 }
