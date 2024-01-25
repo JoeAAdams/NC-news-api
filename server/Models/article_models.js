@@ -67,7 +67,6 @@ exports.createArticle = (post) => {
 }
 
 exports.removeArticle = (id) => {
-    console.log(id)
     return db.query(`
     DELETE FROM articles WHERE article_id = $1`,[id])
 }
