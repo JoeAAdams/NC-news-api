@@ -1,7 +1,7 @@
 const db = require("../../db/connection")
 
 exports.fetchArticles = ({topic, sort_by="created_at",order="desc",limit = 10, p=1}) => {
-    const validSorts = ["title","topic","author","body","created_at","votes","article_img_url"]
+    const validSorts = ["title","topic","author","body","created_at","votes","article_img_url","comment_count"]
     const validOrders = ["asc","desc"]
     const args =[]
 
